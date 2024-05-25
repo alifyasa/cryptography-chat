@@ -9,7 +9,7 @@ import {
   Flex,
   Grid,
 } from '@chakra-ui/react';
-import { DESTINATION_PORT, METHOD, PORT } from '../utils/constant';
+import { DESTINATION_PORT, METHOD, PORT, UNIQUE_CODE } from '../utils/constant';
 import axios from 'axios';
 
 export const Home = () => {
@@ -26,14 +26,30 @@ export const Home = () => {
 
   const sendChat = async () => {
     if (!message) return;
+    if (!localStorage.getItem('shared-key')) return;
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/chats`, {
+      let payload = {
         source_port: PORT,
         destination_port: DESTINATION_PORT,
         method,
         message
-      });
+      };
+      
+      if (method === METHOD.ALS) {
+        const res = await axios.post(`${import.meta.env.VITE_BLOCK_CIPHER_API_URL}/encrypt`, {
+          inputText: JSON.stringify(payload),
+          method: 'CBC',
+          key: localStorage.getItem('shared-key'),
+          encryptionLength: 1,
+        });
+
+        payload = {
+          message: UNIQUE_CODE.ALS + res.data.result
+        }
+      }
+
+      await axios.post(`${import.meta.env.VITE_API_URL}/chats`, payload);
       setMessage('');
       fetchChats();
     } catch (error) {
@@ -51,6 +67,7 @@ export const Home = () => {
   };
 
   useEffect(() => {
+    localStorage.removeItem('shared-key');
     fetchChats();
 
     const intervalId = setInterval(getSharedKey, 10000);
