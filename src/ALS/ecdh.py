@@ -1,5 +1,13 @@
 from random import randint
 
+# Elliptic Curve parameters
+# We'll use a simple curve y^2 = x^3 + ax + b (mod p)
+a = 2
+b = 2
+p = 17  # Prime number
+G = (15, 13)  # Base point (generator point)
+n = 19  # Order of the generator point
+
 # Elliptic Curve Point Addition
 def point_addition(p1, p2):
     if p1 is None:
@@ -9,10 +17,12 @@ def point_addition(p1, p2):
     x1, y1 = p1
     x2, y2 = p2
 
-    if p1 == p2:
-        m = ((3 * x1 * x1 + a) * pow(2 * y1, -1, p)) % p
+    if x1 == x2 and y1 == y2:
+        # Point doubling
+        m = ((3 * x1 * x1 + a) * pow(2 * y1, p - 2, p)) % p
     else:
-        m = ((y2 - y1) * pow(x2 - x1, -1, p)) % p
+        # Point addition
+        m = ((y2 - y1) * pow(x2 - x1, p - 2, p)) % p
 
     x3 = (m * m - x1 - x2) % p
     y3 = (m * (x1 - x3) - y1) % p
@@ -20,14 +30,16 @@ def point_addition(p1, p2):
     return (x3, y3)
 
 # Elliptic Curve Point Multiplication
-def point_multiplication(k, p):
+def point_multiplication(k, point):
     result = None
-    addend = p
+    addend = point
+
     while k:
         if k & 1:
             result = point_addition(result, addend)
         addend = point_addition(addend, addend)
         k >>= 1
+
     return result
 
 # Key generation function
@@ -42,19 +54,15 @@ def generate_shared_secret(private_key, public_key):
     return shared_secret[0]  # Return only the x-coordinate as shared secret
 
 if __name__ == "__main__":
-    # Elliptic Curve parameters
-    # We'll use a simple curve y^2 = x^3 + ax + b (mod p)
-    a = 2
-    b = 2
-    p = 17  # Prime number
-    G = (15, 13)  # Base point (generator point)
-    n = 19  # Order of the generator point
-    
     # Alice's side
     alice_private_key, alice_public_key = generate_key()
+    print("Alice's private key:", alice_private_key)
+    print("Alice's public key:", alice_public_key)
 
     # Bob's side
     bob_private_key, bob_public_key = generate_key()
+    print("Bob's private key:", bob_private_key)
+    print("Bob's public key:", bob_public_key)
 
     # Alice computes shared secret
     alice_shared_secret = generate_shared_secret(alice_private_key, bob_public_key)
