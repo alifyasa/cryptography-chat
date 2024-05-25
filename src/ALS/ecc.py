@@ -17,7 +17,10 @@ def point_addition(p1, p2, a, b, p):
         if x1 == x2:
             return None  # Point at infinity
         # Point addition
-        m = ((y2 - y1) * pow(x2 - x1, p - 2, p)) % p
+        if a == b:
+            m = ((3 * x1**2 + a) * pow(2 * y1, p - 2, p)) % p
+        else:
+            m = ((y2 - y1) * pow(x2 - x1, p - 2, p)) % p
 
     x3 = (m**2 - x1 - x2) % p
     y3 = (m * (x1 - x3) - y1) % p

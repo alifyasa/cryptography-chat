@@ -33,6 +33,16 @@ def getAllKeyECDH():
     # Both should have the same shared secret
     assert alice_shared_secret == bob_shared_secret
 
+    # Save keys to files
+    with open("../../test/alice_private_key.ecprv", "w") as f:
+        f.write(str(alice_private_key))
+    with open("../../test/alice_public_key.ecpub", "w") as f:
+        f.write(str(alice_public_key))
+    with open("../../test/bob_private_key.ecprv", "w") as f:
+        f.write(str(bob_private_key))
+    with open("../../test/bob_public_key.ecpub", "w") as f:
+        f.write(str(bob_public_key))
+
     return bob_private_key, bob_public_key, alice_private_key, alice_public_key, alice_shared_secret
 
 if __name__ == "__main__":
