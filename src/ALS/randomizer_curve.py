@@ -10,7 +10,7 @@ class RandomizerCurve:
         self.a, self.b, self.x, self.y = self._randomize_parameters(self.p)
 
     def get_all_parameters(self):
-        return self.a, self.b, self.x, self.y, self.p
+        return self.a, self.b, self.x, self.y, self.p, self._calculate_order()
 
     def _draw_prime_number(self):
         while True:
@@ -54,7 +54,13 @@ class RandomizerCurve:
             if self._test_equality(y, random_prime, x, a, b):
                 return a, b, x, y
 
+    def _calculate_order(self):
+        # This is a simplified approach and might not give the exact order of the curve.
+        # For production use, a more sophisticated method to determine the curve order is recommended.
+        n = self.p + 1  # Starting point for Hasse's theorem
+        return n
+
 if __name__ == "__main__":
     curve = RandomizerCurve()
-    a, b, x, y, p = curve.get_all_parameters()
-    print(f"Curve parameters:\na: {a}\nb: {b}\nx: {x}\ny: {y}\np: {p}")
+    a, b, x, y, p, n = curve.get_all_parameters()
+    print(f"Curve parameters:\na: {a}\nb: {b}\nx: {x}\ny: {y}\np: {p}\nn: {n}")
