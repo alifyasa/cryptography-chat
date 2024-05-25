@@ -1,74 +1,40 @@
 from random import randint
-
-# Elliptic Curve parameters
-# We'll use a simple curve y^2 = x^3 + ax + b (mod p)
-a = 2
-b = 2
-p = 17  # Prime number
-G = (15, 13)  # Base point (generator point)
-n = 19  # Order of the generator point
-
-# Elliptic Curve Point Addition
-def point_addition(p1, p2):
-    if p1 is None:
-        return p2
-    if p2 is None:
-        return p1
-    x1, y1 = p1
-    x2, y2 = p2
-
-    if x1 == x2 and y1 == y2:
-        # Point doubling
-        m = ((3 * x1 * x1 + a) * pow(2 * y1, p - 2, p)) % p
-    else:
-        # Point addition
-        m = ((y2 - y1) * pow(x2 - x1, p - 2, p)) % p
-
-    x3 = (m * m - x1 - x2) % p
-    y3 = (m * (x1 - x3) - y1) % p
-
-    return (x3, y3)
-
-# Elliptic Curve Point Multiplication
-def point_multiplication(k, point):
-    result = None
-    addend = point
-
-    while k:
-        if k & 1:
-            result = point_addition(result, addend)
-        addend = point_addition(addend, addend)
-        k >>= 1
-
-    return result
+from randomizer_curve import RandomizerCurve
+from ecc import *
 
 # Key generation function
-def generate_key():
-    private_key = randint(1, n-1)  # Random integer between 1 and n-1
-    public_key = point_multiplication(private_key, G)
+def generate_key(n, G, a, p):
+    private_key = randint(1, n - 1)  # Random integer between 1 and n-1
+    public_key = point_multiplication(private_key, G, a, p)
     return private_key, public_key
 
 # Shared secret generation function
-def generate_shared_secret(private_key, public_key):
-    shared_secret = point_multiplication(private_key, public_key)
+def generate_shared_secret(private_key, public_key, a, p):
+    shared_secret = point_multiplication(private_key, public_key, a, p)
     return shared_secret[0]  # Return only the x-coordinate as shared secret
 
 if __name__ == "__main__":
+    # Initialize curve parameters
+    randomizerCurve = RandomizerCurve()
+    a, b, gx, gy, p = randomizerCurve.get_all_parameters()
+    G = (gx, gy)
+    n = 19  # Order of the generator point (this should typically be the order of the base point, needs to be adapted for your curve)
+
     # Alice's side
-    alice_private_key, alice_public_key = generate_key()
+    alice_private_key, alice_public_key = generate_key(n, G, a, p)
     print("Alice's private key:", alice_private_key)
     print("Alice's public key:", alice_public_key)
 
     # Bob's side
-    bob_private_key, bob_public_key = generate_key()
+    bob_private_key, bob_public_key = generate_key(n, G, a, p)
     print("Bob's private key:", bob_private_key)
     print("Bob's public key:", bob_public_key)
 
     # Alice computes shared secret
-    alice_shared_secret = generate_shared_secret(alice_private_key, bob_public_key)
+    alice_shared_secret = generate_shared_secret(alice_private_key, bob_public_key, a, p)
 
     # Bob computes shared secret
-    bob_shared_secret = generate_shared_secret(bob_private_key, alice_public_key)
+    bob_shared_secret = generate_shared_secret(bob_private_key, alice_public_key, a, p)
 
     # Both should have the same shared secret
     assert alice_shared_secret == bob_shared_secret
