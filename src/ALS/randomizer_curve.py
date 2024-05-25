@@ -7,7 +7,7 @@ PRIME_NUMBER_SIZE = 256
 class RandomizerCurve:
     def __init__(self):
         self.p = self._draw_prime_number()
-        self.a, self.b, self.x, self.y = self._draw_parameters(self.p)
+        self.a, self.b, self.x, self.y = self._randomize_parameters(self.p)
 
     def get_all_parameters(self):
         return self.a, self.b, self.x, self.y, self.p
@@ -35,7 +35,7 @@ class RandomizerCurve:
         f_test = (x**3 + a * x + b) % p
         return y_squared == f_test
 
-    def _draw_parameters(self, random_prime):
+    def _randomize_parameters(self, random_prime):
         while True:
             a = random.randrange(2, random_prime - 1)
             b = random.randrange(2, random_prime - 1)
