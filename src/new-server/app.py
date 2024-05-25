@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from services.ecdh import getAllKeyECDH
 from sqlalchemy import create_engine
 import os
 import pandas as pd
@@ -15,7 +16,13 @@ DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 DB_NAME = os.getenv('DB_NAME')
+
 mysql_engine = create_engine(f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+bob_private_key, bob_public_key, alice_private_key, alice_public_key, alice_shared_secret = getAllKeyECDH()
+
+@app.route('/api/shared-key', methods=['GET'])
+def get_shared_key():
+  return jsonify({'shared_key': alice_shared_secret})
 
 @app.route('/api/chats', methods=['GET'])
 def get_chats():

@@ -1,6 +1,6 @@
 from random import randint
-from randomizer_curve import RandomizerCurve
-from ecc import *
+from services.randomizer_curve import RandomizerCurve
+from services.ecc import *
 
 # Key generation function
 def generate_key(n, G, a, b, p):
