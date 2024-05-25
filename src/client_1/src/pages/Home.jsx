@@ -9,19 +9,43 @@ import {
   Flex,
   Grid,
 } from '@chakra-ui/react';
-import { METHOD } from '../utils/constant';
+import { DESTINATION_PORT, METHOD, PORT } from '../utils/constant';
 import axios from 'axios';
 
 export const Home = () => {
   const [method, setMethod] = useState(METHOD.ALS);
+  const [chats, setChats] = useState([]);
   const [message, setMessage] = useState('');
-  // const [messages, setMessages] = useState([]);
-  const [messages, setMessages] = useState([
-    { text: 'Hello', sender: 'me' },
-    { text: 'Hi', sender: 'you' },
-    { text: 'How are you?', sender: 'me' },
-    { text: 'I am fine', sender: 'you' },
-  ]);
+
+  const sendChat = async () => {
+    if (!message) return;
+
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/chats`, {
+        source_port: PORT,
+        destination_port: DESTINATION_PORT,
+        method,
+        message
+      });
+      setMessage('');
+      fetchChats();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const fetchChats = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/chats`);
+      setChats(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchChats();
+  }, []);
 
   return (
     <>
@@ -40,20 +64,19 @@ export const Home = () => {
           flexDirection="column"
           alignItems="flex-end"
         >
-          {/* Display messages */}
-          {messages.map((msg, index) => (
+          {chats.map((chat, index) => (
             <div 
               key={index} 
               style={{
-                backgroundColor: msg.sender === 'me' ? 'green' : 'white',
-                color: msg.sender === 'me' ? 'white' : 'black',
+                backgroundColor: chat.source_port == PORT ? 'green' : 'white',
+                color: chat.source_port == PORT ? 'white' : 'black',
                 padding: '8px',
                 margin: '4px 0',
                 borderRadius: '8px',
-                alignSelf: msg.sender === 'me' ? 'flex-end' : 'flex-start'
+                alignSelf: chat.source_port == PORT ? 'flex-end' : 'flex-start'
               }}
             >
-              {msg.text}
+              {chat.message}
             </div>
           ))}
         </Box>
@@ -85,7 +108,7 @@ export const Home = () => {
               />
             </FormControl>
             <FormControl mt="2">
-              <Button colorScheme="green" size="md">Send</Button>
+              <Button colorScheme="green" size="md" onClick={sendChat}>Send</Button>
             </FormControl>
           </Grid>
         </Box>
