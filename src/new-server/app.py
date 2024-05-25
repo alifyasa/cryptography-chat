@@ -19,6 +19,7 @@ DB_NAME = os.getenv('DB_NAME')
 
 mysql_engine = create_engine(f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 bob_private_key, bob_public_key, alice_private_key, alice_public_key, alice_shared_secret = getAllKeyECDH()
+print (alice_shared_secret)
 
 @app.route('/api/shared-key', methods=['GET'])
 def get_shared_key():

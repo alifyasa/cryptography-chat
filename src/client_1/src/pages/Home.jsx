@@ -17,6 +17,13 @@ export const Home = () => {
   const [chats, setChats] = useState([]);
   const [message, setMessage] = useState('');
 
+  const getSharedKey = async () => {
+    if (!localStorage.getItem('shared-key')) {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/shared-key`);
+      localStorage.setItem('shared-key', res.data.shared_key);
+    }
+  }
+
   const sendChat = async () => {
     if (!message) return;
 
@@ -45,6 +52,9 @@ export const Home = () => {
 
   useEffect(() => {
     fetchChats();
+
+    const intervalId = setInterval(getSharedKey, 10000);
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
