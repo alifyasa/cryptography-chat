@@ -39,7 +39,7 @@ export const Home = () => {
       if (method === METHOD.ALS) {
         const res = await axios.post(`${import.meta.env.VITE_BLOCK_CIPHER_API_URL}/encrypt`, {
           inputText: JSON.stringify(payload),
-          method: 'CBC',
+          method: 'ECB',
           key: localStorage.getItem('shared-key'),
           encryptionLength: 1,
         });
@@ -47,6 +47,7 @@ export const Home = () => {
         payload = {
           message: UNIQUE_CODE.ALS + res.data.result
         }
+        console.log(localStorage.getItem('shared-key'))
       }
 
       await axios.post(`${import.meta.env.VITE_API_URL}/chats`, payload);

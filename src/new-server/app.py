@@ -7,6 +7,7 @@ from services.schnorr_generate import SCHNORR_ALPHA, SCHNORR_P, SCHNORR_Q
 from sqlalchemy import create_engine
 import os
 import pandas as pd
+import json
 import requests
 
 load_dotenv()
@@ -22,10 +23,11 @@ DB_NAME = os.getenv('DB_NAME')
 
 mysql_engine = create_engine(f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 bob_private_key, bob_public_key, alice_private_key, alice_public_key, alice_shared_secret = getAllKeyECDH()
+print(alice_shared_secret)
 
 @app.route('/api/shared-key', methods=['GET'])
 def get_shared_key():
-  return jsonify({'shared_key': alice_shared_secret})
+  return jsonify({'shared_key': str(alice_shared_secret)})
 
 @app.route('/api/chats', methods=['GET'])
 def get_chats():
@@ -37,6 +39,7 @@ def get_chats():
 @app.route('/api/chats', methods=['POST'])
 def send_chat():
   payload = request.json
+  df = pd.DataFrame([payload])
 
   # Decrypt ALS
   if payload['message'].startswith(UNIQUE_CODE['ALS']):
@@ -44,16 +47,16 @@ def send_chat():
     print(payload['message'][len(UNIQUE_CODE['ALS']):])
     block_cipher_payload = {
       'inputText': payload['message'][len(UNIQUE_CODE['ALS']):],
-      'method': 'CBC',
+      'method': 'ECB',
       'key': str(alice_shared_secret),
       'encryptionLength': 1
     }
     response = requests.post(url, json=block_cipher_payload)
+    result = json.loads(response.json()['result'])
 
-    print(response.json())
-  print(payload)
-  # return True
-  df = pd.DataFrame([payload])
+    df = pd.DataFrame([result])
+
+  # Insert to database
   df.to_sql('chats', con=mysql_engine, if_exists='append', index=False)
   
   return jsonify({'message': 'Chat sent!'})
