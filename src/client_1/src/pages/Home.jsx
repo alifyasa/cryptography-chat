@@ -29,6 +29,21 @@ export const Home = () => {
   }
 
   const [eccKeys, setEccKeys] = useState({ ourPrivateKey: '', theirPublicKey: '' });
+  const decryptEccMessage = (message) => {
+    if (!message.startsWith(UNIQUE_CODE.E2EE)) {
+      return message
+    }
+    if (!eccKeys.ourPrivateKey){
+      return '[ Encrypted. Please input private key ]'
+    }
+    console.log(message.slice(UNIQUE_CODE.E2EE.length))
+    try {
+      return eccDecrypt(message.slice(UNIQUE_CODE.E2EE.length), parseInt(eccKeys.ourPrivateKey));
+    } catch (e){
+      console.log(e)
+      return "[ Decryption Failed ]"
+    }
+  }
 
   const getSharedKey = async () => {
     if (!localStorage.getItem('shared-key')) {
@@ -157,7 +172,7 @@ export const Home = () => {
                     whiteSpace: 'pre-wrap'
                   }}
                 >
-                  {chat.message}
+                  {decryptEccMessage(chat.message)}
                   <span
                     title={new Date(chat.created_at).toISOString()}
                     style={{
