@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from services.ecdh import getAllKeyECDH
+from services.schnorr_generate import SCHNORR_ALPHA, SCHNORR_P, SCHNORR_Q
 from sqlalchemy import create_engine
 import os
 import pandas as pd
@@ -51,11 +52,19 @@ def send_chat():
 
     print(response.json())
   print(payload)
-  return True
-  # df = pd.DataFrame([payload])
-  # df.to_sql('chats', con=mysql_engine, if_exists='append', index=False)
+  # return True
+  df = pd.DataFrame([payload])
+  df.to_sql('chats', con=mysql_engine, if_exists='append', index=False)
   
-  # return jsonify({'message': 'Chat sent!'})
+  return jsonify({'message': 'Chat sent!'})
+
+@app.route('/schnorr-pkey', methods=['GET'])
+def get_schnorr_pkey():
+  return jsonify({
+    'alpha': SCHNORR_ALPHA,
+    'p': SCHNORR_P,
+    'q': SCHNORR_Q
+  })
 
 if __name__ == '__main__':
   app.run(port=os.getenv('PORT'))
