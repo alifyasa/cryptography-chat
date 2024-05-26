@@ -105,18 +105,27 @@ export const Home = () => {
           alignItems="flex-end"
         >
           {chats.map((chat, index) => (
-            <div 
-              key={index} 
-              style={{
-                backgroundColor: chat.source_port == PORT ? 'green' : 'white',
-                color: chat.source_port == PORT ? 'white' : 'black',
-                padding: '8px',
-                margin: '4px 0',
-                borderRadius: '8px',
-                alignSelf: chat.source_port == PORT ? 'flex-end' : 'flex-start'
-              }}
-            >
-              {chat.message}
+            <div key={index} style={{
+              alignSelf: chat.source_port === PORT ? 'flex-end' : 'flex-start'
+            }}>
+              <div style={{
+                textAlign: chat.source_port === PORT ? 'right' : 'left',
+                marginBottom: '4px'
+              }}>
+                {chat.source_port === PORT ? 'You' : chat.destination_port}
+              </div>
+              <div 
+                style={{
+                  backgroundColor: chat.source_port === PORT ? 'green' : 'white',
+                  color: chat.source_port === PORT ? 'white' : 'black',
+                  padding: '8px',
+                  margin: '4px 0',
+                  borderRadius: '8px',
+                  alignSelf: chat.source_port === PORT ? 'flex-end' : 'flex-start'
+                }}
+              >
+                {chat.message}
+              </div>
             </div>
           ))}
         </Box>
