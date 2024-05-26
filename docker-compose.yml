@@ -4,7 +4,6 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: 'cryptography_chat'
-      MYSQL_USER: 'root'
       MYSQL_PASSWORD: 'willy'
       MYSQL_ROOT_PASSWORD: 'willy'
     ports:
@@ -35,7 +34,7 @@ services:
     volumes:
       - ./src/client_2:/app
   new_server:
-    build: ./src/new_server
+    build: ./src/new-server
     ports:
       - "8080:8080"
     depends_on:
