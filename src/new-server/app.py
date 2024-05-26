@@ -25,6 +25,16 @@ mysql_engine = create_engine(f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_H
 bob_private_key, bob_public_key, alice_private_key, alice_public_key, alice_shared_secret = get_all_key_ECDH()
 print(alice_shared_secret)
 
+@app.route('/api/shared-key/validation', methods=['POST'])
+def validate_shared_key():
+  payload = request.json
+  shared_key = payload['shared_key']
+
+  if shared_key == str(alice_shared_secret):
+    return jsonify({'is_valid': True, 'message': 'Shared key is valid!'})
+  else:
+    return jsonify({'is_valid': False, 'message': 'Shared key is invalid!'})
+
 @app.route('/api/shared-key', methods=['GET'])
 def get_shared_key():
   return jsonify({'shared_key': str(alice_shared_secret)})

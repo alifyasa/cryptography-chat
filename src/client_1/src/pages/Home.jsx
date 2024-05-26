@@ -46,9 +46,20 @@ export const Home = () => {
   }
 
   const getSharedKey = async () => {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/shared-key`);
+    localStorage.setItem('shared-key', res.data.shared_key);
+  }
+
+  const checkSharedKey = async () => {
     if (!localStorage.getItem('shared-key')) {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/shared-key`);
-      localStorage.setItem('shared-key', res.data.shared_key);
+      await getSharedKey();
+    } else {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/shared-key/validation`, {
+        shared_key: localStorage.getItem('shared-key')
+      });
+      if (!res.data.is_valid) {
+        await getSharedKey();
+      }
     }
   }
 
@@ -75,7 +86,6 @@ export const Home = () => {
         payload = {
           message: UNIQUE_CODE.ALS + res.data.result
         }
-        console.log(localStorage.getItem('shared-key'))
       } else if (method === METHOD.E2EE) {
         const cipherText = eccEncrypt(message, eccKeys.theirPublicKey);
         payload = {
@@ -106,8 +116,8 @@ export const Home = () => {
     fetchChats();
 
     // Get shared key every 10 seconds
-    const getSharedKeyIntervalId = setInterval(() => {
-      getSharedKey();
+    const checkSharedKeyIntervalId = setInterval(() => {
+      checkSharedKey();
     }, 10000);
 
     // fetch chat every second
@@ -116,7 +126,7 @@ export const Home = () => {
     }, 1000);
 
     return () => {
-      clearInterval(getSharedKeyIntervalId);
+      clearInterval(checkSharedKeyIntervalId);
       clearInterval(getChatIntervalId);
     };
   }, []);
