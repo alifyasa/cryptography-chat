@@ -106,25 +106,55 @@ export const Home = () => {
         >
           {chats.map((chat, index) => (
             <div key={index} style={{
-              alignSelf: chat.source_port === PORT ? 'flex-end' : 'flex-start'
+              display: 'flex',
+              flexDirection: 'column',
+              alignSelf: chat.source_port === PORT ? 'flex-end' : 'flex-start',
+              marginBottom: '8px'
             }}>
               <div style={{
-                textAlign: chat.source_port === PORT ? 'right' : 'left',
-                marginBottom: '4px'
+                textAlign: chat.source_port === PORT ? 'right' : 'left'
               }}>
                 {chat.source_port === PORT ? 'You' : chat.destination_port}
               </div>
               <div 
                 style={{
-                  backgroundColor: chat.source_port === PORT ? 'green' : 'white',
-                  color: chat.source_port === PORT ? 'white' : 'black',
-                  padding: '8px',
-                  margin: '4px 0',
-                  borderRadius: '8px',
-                  alignSelf: chat.source_port === PORT ? 'flex-end' : 'flex-start'
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: chat.source_port === PORT ? 'flex-end' : 'flex-start'
                 }}
               >
-                {chat.message}
+                <div 
+                  style={{
+                    backgroundColor: chat.source_port === PORT ? 'green' : 'white',
+                    color: chat.source_port === PORT ? 'white' : 'black',
+                    padding: '8px',
+                    margin: '4px 0',
+                    borderRadius: '8px',
+                    alignSelf: chat.source_port === PORT ? 'flex-end' : 'flex-start',
+                    position: 'relative',
+                    minHeight: '24px',
+                    minWidth: '100px',
+                    whiteSpace: 'pre-wrap'
+                  }}
+                >
+                  {chat.message}
+                  <span 
+                    title={new Date(chat.created_at).toISOString()}
+                    style={{
+                      fontSize: '8px',
+                      color: 'black',
+                      position: 'absolute',
+                      bottom: '-10px',
+                      right: '4px',
+                      maxWidth: '80px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
+                    {new Date(chat.created_at).toISOString().slice(0, 19).replace('T', ' ')}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
