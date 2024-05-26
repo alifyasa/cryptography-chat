@@ -13,7 +13,7 @@ import { DESTINATION_PORT, METHOD, PORT, UNIQUE_CODE } from '../utils/constant';
 import axios from 'axios';
 
 export const Home = () => {
-  const [method, setMethod] = useState(METHOD.ALS);
+  const [method, setMethod] = useState(METHOD.E2EE);
   const [chats, setChats] = useState([]);
   const [message, setMessage] = useState('');
 
@@ -71,16 +71,28 @@ export const Home = () => {
     localStorage.removeItem('shared-key');
     fetchChats();
 
-    const intervalId = setInterval(getSharedKey, 10000);
-    return () => clearInterval(intervalId);
+    // Get shared key every 10 seconds
+    const getSharedKeyIntervalId = setInterval(() => {
+      getSharedKey();
+    }, 10000);
+    
+    // fetch chat every second
+    const getChatIntervalId = setInterval(() => {
+      fetchChats();
+    }, 1000);
+
+    return () => {
+      clearInterval(getSharedKeyIntervalId);
+      clearInterval(getChatIntervalId);
+    };
   }, []);
 
   return (
-    <>
+    <Flex direction="column" height="100vh">
       <Heading as="h1" size="xl" textAlign="center" my="4" mx="4">
         Cryptography Chat
       </Heading>
-      <Flex direction="column" align="center" justify="space-between" h="80vh">
+      <Flex direction="column" align="center" justify="space-between" flexGrow={1}>
         <Box
           bg="gray.200"
           p="4" 
@@ -141,6 +153,6 @@ export const Home = () => {
           </Grid>
         </Box>
       </Flex>
-    </>
+    </Flex>
   );
 };
