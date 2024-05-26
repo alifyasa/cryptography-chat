@@ -2,7 +2,7 @@ from constant import UNIQUE_CODE
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from services.ecdh import getAllKeyECDH
+from services.ecdh import get_all_key_ECDH
 from services.schnorr_generate import SCHNORR_ALPHA, SCHNORR_P, SCHNORR_Q
 from sqlalchemy import create_engine
 import os
@@ -22,7 +22,7 @@ DB_PORT = os.getenv('DB_PORT')
 DB_NAME = os.getenv('DB_NAME')
 
 mysql_engine = create_engine(f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
-bob_private_key, bob_public_key, alice_private_key, alice_public_key, alice_shared_secret = getAllKeyECDH()
+bob_private_key, bob_public_key, alice_private_key, alice_public_key, alice_shared_secret = get_all_key_ECDH()
 print(alice_shared_secret)
 
 @app.route('/api/shared-key', methods=['GET'])
