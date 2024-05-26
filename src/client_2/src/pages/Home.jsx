@@ -33,14 +33,12 @@ export const Home = () => {
     if (!message.startsWith(UNIQUE_CODE.E2EE)) {
       return message
     }
-    if (!eccKeys.ourPrivateKey){
+    if (!eccKeys.ourPrivateKey) {
       return '[ Encrypted. Please input private key ]'
     }
-    console.log(message.slice(UNIQUE_CODE.E2EE.length))
     try {
       return eccDecrypt(message.slice(UNIQUE_CODE.E2EE.length), parseInt(eccKeys.ourPrivateKey));
-    } catch (e){
-      console.log(e)
+    } catch (e) {
       return "[ Decryption Failed ]"
     }
   }
@@ -87,6 +85,9 @@ export const Home = () => {
           message: UNIQUE_CODE.ALS + res.data.result
         }
       } else if (method === METHOD.E2EE) {
+        if (!eccKeys.theirPublicKey.x || !eccKeys.theirPublicKey.y) {
+          throw new Error('Please input public key');
+        }
         const cipherText = eccEncrypt(message, eccKeys.theirPublicKey);
         payload = {
           ...payload,
