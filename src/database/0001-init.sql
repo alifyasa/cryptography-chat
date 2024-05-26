@@ -1,8 +1,8 @@
-CREATE DATABASE cryptography_chat;
+CREATE DATABASE IF NOT EXISTS cryptography_chat;
 
 USE cryptography_chat;
 
-CREATE TABLE chats (
+CREATE TABLE IF NOT EXISTS chats (
     id INT PRIMARY KEY AUTO_INCREMENT,
     source_port INT NOT NULL,
     destination_port INT NOT NULL,

@@ -23,7 +23,8 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./src/client_1:/app
+      - ./src/client_1/src:/app/src
+      - /app/node_modules/
   client_2:
     build: ./src/client_2
     ports:
@@ -32,7 +33,8 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./src/client_2:/app
+      - ./src/client_2/src:/app/src
+      - /app/node_modules/
   new_server:
     build: ./src/new-server
     ports:
