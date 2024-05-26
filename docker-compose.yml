@@ -1,0 +1,43 @@
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'cryptography_chat'
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: 'willy'
+      MYSQL_ROOT_PASSWORD: 'willy'
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./src/database:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+  client_1:
+    build: ./src/client_1
+    ports:
+      - "4020:4020"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src/client_1:/app
+  client_2:
+    build: ./src/client_2
+    ports:
+      - "2040:2040"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src/client_2:/app
+  new_server:
+    build: ./src/new_server
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
