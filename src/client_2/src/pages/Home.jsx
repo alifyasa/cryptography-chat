@@ -8,6 +8,8 @@ import {
   Button,
   Flex,
   Grid,
+  FormLabel,
+  Input
 } from '@chakra-ui/react';
 import { DESTINATION_PORT, METHOD, PORT, UNIQUE_CODE } from '../utils/constant';
 import axios from 'axios';
@@ -35,7 +37,7 @@ export const Home = () => {
         method,
         message
       };
-      
+
       if (method === METHOD.ALS) {
         const res = await axios.post(`${import.meta.env.VITE_BLOCK_CIPHER_API_URL}/encrypt`, {
           inputText: JSON.stringify(payload),
@@ -71,11 +73,11 @@ export const Home = () => {
     localStorage.removeItem('shared-key');
     fetchChats();
 
-        // Get shared key every 10 seconds
+    // Get shared key every 10 seconds
     const getSharedKeyIntervalId = setInterval(() => {
       getSharedKey();
     }, 10000);
-    
+
     // fetch chat every second
     const getChatIntervalId = setInterval(() => {
       fetchChats();
@@ -88,25 +90,26 @@ export const Home = () => {
   }, []);
 
   return (
-    <Flex direction="column" height="100vh">
-      <Heading as="h1" size="xl" textAlign="center" my="4" mx="4">
+    <Flex direction="column" height="100vh" width="100vw">
+      <Heading as="h1" size="xl" textAlign="center" my="4">
         Cryptography Chat
       </Heading>
-      <Flex direction="column" align="center" justify="space-between" flexGrow={1}>
+      <Flex direction="column" align="center" justify="space-between" flex="1" overflowY="auto">
         <Box
+
           bg="gray.200"
           p="4" 
-          mx="4" 
           flex="1" 
           overflowY="auto" 
           w="100%" 
           display="flex" 
           flexDirection="column"
           alignItems="flex-end"
+
         >
           {chats.map((chat, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               style={{
                 backgroundColor: chat.source_port == PORT ? 'green' : 'white',
                 color: chat.source_port == PORT ? 'white' : 'black',
@@ -120,14 +123,16 @@ export const Home = () => {
             </div>
           ))}
         </Box>
+      </Flex>
+      <Box w="100%">
         <Box p="4" w="100%">
-          <Grid templateColumns="10% 80% 10%" gap="4" alignItems="center">
+          <Grid templateColumns="10% 78% 10%" alignItems="center" justifyContent="space-between">
             <FormControl mt="2">
-              <Select 
-                borderWidth="1px" 
-                borderColor="black" 
-                placeholder="Select method" 
-                value={method} 
+              <Select
+                borderWidth="1px"
+                borderColor="black"
+                placeholder="Select method"
+                value={method}
                 onChange={e => setMethod(e.target.value)}
               >
                 <option value={METHOD.ALS}>{METHOD.ALS}</option>
@@ -137,22 +142,38 @@ export const Home = () => {
             </FormControl>
             {/* Chat input */}
             <FormControl mt="2">
-              <Textarea 
-                borderWidth="1px" 
-                borderColor="black" 
-                placeholder="Input chat" 
-                size="sm" 
-                rows={1} 
-                value={message} 
-                onChange={e => setMessage(e.target.value)} 
+              <Textarea
+                borderWidth="1px"
+                borderColor="black"
+                placeholder="Input chat"
+                size="sm"
+                rows={1}
+                value={message}
+                onChange={e => setMessage(e.target.value)}
               />
             </FormControl>
             <FormControl mt="2">
-              <Button colorScheme="green" size="md" onClick={sendChat}>Send</Button>
+              <Button colorScheme="green" size="md" width="100%" onClick={sendChat}>Send</Button>
             </FormControl>
           </Grid>
         </Box>
-      </Flex>
+        {
+          method === METHOD.E2EE && (
+            <Box p="4" pt={0} w="100%">
+              <Grid templateColumns="50% 50%" alignItems="center">
+                <FormControl mt={2}>
+                  <FormLabel>Your Private Key</FormLabel>
+                  <Input type="file" p={2} borderColor="gray.300" _hover={{ borderColor: "gray.400" }} />
+                </FormControl>
+                <FormControl mt={2}>
+                  <FormLabel>Their Public Key</FormLabel>
+                  <Input type="file" p={2} borderColor="gray.300" _hover={{ borderColor: "gray.400" }} />
+                </FormControl>
+              </Grid>
+            </Box>
+          )
+        }
+      </Box>
     </Flex>
   );
 };
