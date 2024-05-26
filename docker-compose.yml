@@ -38,7 +38,9 @@ services:
   new_server:
     build: ./src/new-server
     ports:
-      - "8080:8080"
+      - "5001:5001"
+    volumes:
+      - ./test:/test
     depends_on:
       db:
         condition: service_healthy
